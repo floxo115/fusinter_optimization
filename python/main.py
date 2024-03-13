@@ -1,16 +1,33 @@
-# This is a sample Python script.
+from fusinter import FUSINTERDiscretizer
+import time
 
-# Press F1 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import pandas as pd
 
+# x = load_iris()["data"]
+# y = load_iris()["target"]
+#
+# from fusinter import FUSINTERDiscretizer
+#
+# discretizer = FUSINTERDiscretizer(0.95, 0.99)
+# discretizer.fit(x,y)
+#
+# print(discretizer.splits)
+# print(discretizer.transform(x))
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+cov_x = pd.read_csv("datasets/covtype.data", header=None)
+cov_y = cov_x.pop(cov_x.shape[1] - 1).to_numpy()
+cov_x = cov_x.iloc[:, 0:10].to_numpy()
 
+start = time.perf_counter()
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+n_runs = 5
+for i in range(n_runs):
+    discretizer = FUSINTERDiscretizer(0.95, 0.99, not_concurrent=False)
+    discretizer.fit(cov_x, cov_y)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+end = time.perf_counter()
+
+print(discretizer.splits)
+print(discretizer.transform(cov_x))
+print(discretizer.transform(cov_x).shape)
+print((end - start)/n_runs)
